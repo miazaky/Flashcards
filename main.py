@@ -2,7 +2,12 @@ from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-flashcards = [ ]
+flashcards = [
+    {
+        "id": 1,
+        "question": "Who is the most richest person on earth known?",
+        "answer": "Elon musk"
+    }]
 
 
 @app.route('/')

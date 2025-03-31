@@ -1,10 +1,54 @@
 <html>
 <head>
-    <title>
-        Flashcards
-    </title>
+    <title>Flashcards</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .flashcard-panel {
+            margin-top: 20px;
+        }
+        .flashcard {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello guys</h1>
+    <h1>Flashcards</h1>
+    <button id="fetch-flashcards">Fetch Flashcards</button>
+
+    <!-- Area to display flashcards -->
+    <div class="flashcard-panel" id="flashcard-panel"></div>
+
+    <script>
+        $(document).ready(function(){
+            $('#fetch-flashcards').click(function() {
+                $.get('/flashcards', function(data) {
+                    $('#flashcard-panel').empty();
+                    if (data.length > 0) {
+                        data.forEach(function(flashcard) {
+                            $('#flashcard-panel').append(
+                                '<div class="flashcard">' +
+                                    '<strong class="question">' + flashcard.question + '</strong>' +
+                                    '<div class="answer" style="display: none;">' + flashcard.answer + '</div>' +
+                                '</div>'
+                            );
+                        });
+                        $('.question').click(function() {
+                            $(this).next('.answer').toggle();
+                        });
+                    } else {
+                        $('#flashcard-panel').append('<p>No flashcards available.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+    
 </body>
 </html>
