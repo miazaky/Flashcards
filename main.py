@@ -11,8 +11,17 @@ flashcards = [
 
 
 @app.route('/')
+@app.route('/index.html')
 def home():
     return render_template('index.html')
+
+@app.route('/create.html')
+def create():
+    return render_template('create.html')
+
+@app.route('/edit.html')
+def edit():
+    return render_template('edit.html')
 
 @app.route('/flashcards', methods=['GET'])
 def get_flashcards():

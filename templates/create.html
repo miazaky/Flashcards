@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Flashcard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        input, button {
+            padding: 10px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create New Flashcard</h1>
+
+    <form id="create-form">
+        <input type="text" id="new-question" placeholder="Question" required>
+        <input type="text" id="new-answer" placeholder="Answer" required>
+        <button type="submit">Create Flashcard</button>
+    </form>
+
+    <br>
+    <a href="index.html"><button>Back to Home</button></a>
+
+    <script>
+        $('#create-form').submit(function(e) {
+            e.preventDefault();
+            var question = $('#new-question').val();
+            var answer = $('#new-answer').val();
+
+            $.ajax({
+                url: '/flashcards',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ question: question, answer: answer }),
+                success: function(newFlashcard) {
+                    alert("Flashcard created successfully!");
+                    window.location.href = "index.html"; // Redirect to home page
+                }
+            });
+        });
+    </script>
+</body>
+</html>
