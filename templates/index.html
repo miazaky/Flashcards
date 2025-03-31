@@ -1,8 +1,12 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcards</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
+        /* Basic styling */
         .flashcard-panel {
             margin-top: 20px;
         }
@@ -12,6 +16,14 @@
             margin-bottom: 10px;
             background-color: #f9f9f9;
         }
+        .flashcard button {
+            margin-left: 10px;
+        }
+        .answer {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
+        }
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -19,10 +31,13 @@
     </style>
 </head>
 <body>
-    <h1>Flashcards</h1>
-    <button id="fetch-flashcards">Fetch Flashcards</button>
+    <h1>Flashcards App</h1>
 
-    <!-- Area to display flashcards -->
+    <button id="fetch-flashcards">Fetch Flashcards</button>
+    <a href="create.html"><button>Create Flashcard</button></a>  <!-- Link to Create Page -->
+    
+    <br><br>
+
     <div class="flashcard-panel" id="flashcard-panel"></div>
 
     <script>
@@ -33,14 +48,35 @@
                     if (data.length > 0) {
                         data.forEach(function(flashcard) {
                             $('#flashcard-panel').append(
-                                '<div class="flashcard">' +
+                                '<div class="flashcard" id="flashcard-' + flashcard.id + '">' +
                                     '<strong class="question">' + flashcard.question + '</strong>' +
                                     '<div class="answer" style="display: none;">' + flashcard.answer + '</div>' +
+                                    '<button class="edit-btn" data-id="' + flashcard.id + '">Edit</button>' +
+                                    '<button class="delete-btn" data-id="' + flashcard.id + '">Delete</button>' +
                                 '</div>'
                             );
                         });
+
                         $('.question').click(function() {
                             $(this).next('.answer').toggle();
+                        });
+
+                        $('.edit-btn').click(function() {
+                            var id = $(this).data('id');
+                            window.location.href = 'edit.html?id=' + id;  // Redirect to Edit Page with ID
+                        });
+
+                        $('.delete-btn').click(function() {
+                            var id = $(this).data('id');
+                            if (confirm('Are you sure you want to delete this flashcard?')) {
+                                $.ajax({
+                                    url: '/flashcards/' + id,
+                                    type: 'DELETE',
+                                    success: function() {
+                                        $('#flashcard-' + id).remove();
+                                    }
+                                });
+                            }
                         });
                     } else {
                         $('#flashcard-panel').append('<p>No flashcards available.</p>');
@@ -49,6 +85,5 @@
             });
         });
     </script>
-    
 </body>
 </html>
