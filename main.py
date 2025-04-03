@@ -7,11 +7,13 @@ load_dotenv()
 app = Flask(__name__)
 
 uri = os.getenv("mongo_uri")
+
+#uri = "mongodb+srv://<username>:<password>@flashcards.ivivvln.mongodb.net/?retryWrites=true&w=majority&appName=Flashcards"
+#alternative connection
 client = MongoClient(uri)
 
 db = client["flashcards_db"]
 collection = db["flashcards"]
-
 
 @app.route('/')
 @app.route('/index.html')
@@ -39,8 +41,11 @@ def create_flashcard():
         "question": data["question"],
         "answer": data["answer"]
     }
-    collection.insert_one(new_flashcard)
+    result = collection.insert_one(new_flashcard)
+    new_flashcard["_id"] = str(result.inserted_id) 
+
     return jsonify(new_flashcard), 201
+
 
 @app.route('/flashcards/<int:id>', methods=['GET'])
 def get_flashcard(id):

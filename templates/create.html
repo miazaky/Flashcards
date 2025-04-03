@@ -30,14 +30,21 @@
             var question = $('#new-question').val();
             var answer = $('#new-answer').val();
 
+            if (!question || !answer)
+                {
+            alert("Please fill in both the question and answer fields.");
+            return;
+            }
+                
             $.ajax({
                 url: '/flashcards',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ question: question, answer: answer }),
                 success: function(newFlashcard) {
-                    alert("Flashcard created successfully!");
-                    window.location.href = "index.html"; // Redirect to home page
+
+                    $('#new-question').val('');
+                    $('#new-answer').val('');
                 }
             });
         });
