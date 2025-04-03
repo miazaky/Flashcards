@@ -22,7 +22,7 @@
     </form>
 
     <br>
-    <a href="index.html"><button>Back to Home</button></a>
+    <a href="index_editor.html"><button>Back to Home</button></a>
 
     <script>
         $(document).ready(function() {
@@ -52,7 +52,7 @@
                     data: JSON.stringify({ question: question, answer: answer }),
                     success: function(updatedFlashcard) {
                         alert("Flashcard updated successfully!");
-                        window.location.href = "index.html"; // Redirect to home page
+                        window.location.href = "index_editor.html";
                     }
                 });
             });

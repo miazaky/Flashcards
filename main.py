@@ -20,6 +20,10 @@ collection = db["flashcards"]
 def home():
     return render_template('index.html')
 
+@app.route('/index_editor.html')
+def editor():
+    return render_template('index_editor.html')
+
 @app.route('/create.html')
 def create():
     return render_template('create.html')
