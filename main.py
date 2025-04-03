@@ -14,6 +14,7 @@ client = MongoClient(uri)
 
 db = client["flashcards_db"]
 collection = db["flashcards"]
+groups = db["groups"]
 
 @app.route('/')
 @app.route('/index.html')
@@ -36,6 +37,10 @@ def edit():
 def get_flashcards():
     flashcards = list(collection.find({}, {"_id": 0}))
     return jsonify(flashcards)
+
+@app.route('/groups.html')
+def groups():
+    return render_template('groups.html')
 
 @app.route('/flashcards', methods=['POST'])
 def create_flashcard():
