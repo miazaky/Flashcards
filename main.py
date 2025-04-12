@@ -23,7 +23,8 @@ def editor():
 
 @app.route('/create.html')
 def create():
-    return render_template('create.html')
+    groups_list = list(groups.find({}, {"name": 1}))
+    return render_template('create.html', groups=groups_list)
 
 @app.route('/edit.html')
 def edit():
@@ -43,7 +44,8 @@ def create_flashcard():
     data = request.json
     new_flashcard = {
         "question": data["question"],
-        "answer": data["answer"]
+        "answer": data["answer"],
+        "group_id": data["group_id"]
     }
     result = collection.insert_one(new_flashcard)
     new_flashcard["_id"] = str(result.inserted_id) 
