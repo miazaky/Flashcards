@@ -5,11 +5,7 @@ import os
 
 load_dotenv()
 app = Flask(__name__)
-
 uri = os.getenv("mongo_uri")
-
-#uri = "mongodb+srv://<username>:<password>@flashcards.ivivvln.mongodb.net/?retryWrites=true&w=majority&appName=Flashcards"
-#alternative connection
 client = MongoClient(uri)
 
 db = client["flashcards_db"]
@@ -39,14 +35,13 @@ def get_flashcards():
     return jsonify(flashcards)
 
 @app.route('/groups.html')
-def groups():
+def groups_page():
     return render_template('groups.html')
 
 @app.route('/flashcards', methods=['POST'])
 def create_flashcard():
     data = request.json
     new_flashcard = {
-        "id": collection.count_documents({}) + 1,
         "question": data["question"],
         "answer": data["answer"]
     }
@@ -55,6 +50,17 @@ def create_flashcard():
 
     return jsonify(new_flashcard), 201
 
+@app.route('/create_group', methods=['POST'])
+def create_group():
+    data = request.json
+    new_group = {
+        "name": data["name"]
+    }
+    result = groups.insert_one(new_group)
+    new_group["_id"] = str(result.inserted_id)
+
+    return jsonify(new_group), 201
+    
 
 @app.route('/flashcards/<int:id>', methods=['GET'])
 def get_flashcard(id):
