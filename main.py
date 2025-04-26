@@ -107,9 +107,10 @@ def update_flashcard(id):
     updated_flashcard = collection.find_one({"_id": object_id}, {"_id": 0})
     return jsonify(updated_flashcard)
 
-@app.route('/flashcards/<int:id>', methods=['DELETE'])
+@app.route('/flashcards/<string:id>', methods=['DELETE'])
 def delete_flashcard(id):
-    result = collection.delete_one({"id": id})
+    object_id = ObjectId(id)
+    result = collection.delete_one({"_id": object_id})
 
     if result.deleted_count == 0:
         return jsonify({"error": "Flashcard not found"}), 404
