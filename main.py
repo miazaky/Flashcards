@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
+from bson import ObjectId
 from dotenv import load_dotenv
 import os
 
@@ -28,12 +29,16 @@ def create():
 
 @app.route('/edit.html')
 def edit():
-    return render_template('edit.html')
+    groups_list = list(groups.find({}, {"name": 1}))
+    return render_template('edit.html', groups=groups_list)
 
 @app.route('/flashcards', methods=['GET'])
 def get_flashcards():
-    flashcards = list(collection.find({}, {"_id": 0}))
+    flashcards = list(collection.find({}))
+    for flashcard in flashcards:
+        flashcard['_id'] = str(flashcard['_id'])
     return jsonify(flashcards)
+
 
 @app.route('/groups.html')
 def groups_page():
@@ -64,15 +69,26 @@ def create_group():
     return jsonify(new_group), 201
     
 
-@app.route('/flashcards/<int:id>', methods=['GET'])
+@app.route('/flashcards/<string:id>', methods=['GET'])
 def get_flashcard(id):
-    flashcard = collection.find_one({"id": id}, {"_id": 0})
+    try:
+        object_id = ObjectId(id)  
+    except Exception as e:
+        return jsonify({"error": "Invalid Flashcard ID"}), 400
+    flashcard = collection.find_one({"_id": object_id})
+    
     if flashcard:
+        flashcard['_id'] = str(flashcard['_id']) 
         return jsonify(flashcard)
     return jsonify({"error": "Flashcard not found"}), 404
 
-@app.route('/flashcards/<int:id>', methods=['PUT'])
+@app.route('/flashcards/<string:id>', methods=['PUT'])
 def update_flashcard(id):
+    try:
+        object_id = ObjectId(id)
+    except Exception as e:
+        return jsonify({"error": "Invalid Flashcard ID"}), 469
+
     data = request.json
     updated_data = {"$set": {}}
 
@@ -80,13 +96,15 @@ def update_flashcard(id):
         updated_data["$set"]["question"] = data["question"]
     if "answer" in data:
         updated_data["$set"]["answer"] = data["answer"]
+    if "group_id" in data:
+        updated_data["$set"]["group_id"] = data["group_id"]
 
-    result = collection.update_one({"id": id}, updated_data)
+    result = collection.update_one({"_id": object_id}, updated_data)
 
     if result.modified_count == 0:
         return jsonify({"error": "Flashcard not found"}), 404
 
-    updated_flashcard = collection.find_one({"id": id}, {"_id": 0})
+    updated_flashcard = collection.find_one({"_id": object_id}, {"_id": 0})
     return jsonify(updated_flashcard)
 
 @app.route('/flashcards/<int:id>', methods=['DELETE'])

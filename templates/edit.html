@@ -6,7 +6,7 @@
     <title>Edit Flashcard</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        input, button {
+        input, button , select {
             padding: 10px;
             margin: 5px;
         }
@@ -18,6 +18,15 @@
     <form id="edit-form">
         <input type="text" id="edit-question" placeholder="Question" required>
         <input type="text" id="edit-answer" placeholder="Answer" required>
+
+        <label for="group">Select Group:</label>
+        <select id="edit-group" required>
+            <option value="">Select a group</option>
+            {% for group in groups %}
+                <option value="{{ group.id }}">{{ group.name }}</option>
+            {% endfor %}
+        </select>
+
         <button type="submit">Save Changes</button>
     </form>
 
@@ -26,33 +35,40 @@
 
     <script>
         $(document).ready(function() {
-            var urlParams = new URLSearchParams(window.location.search);
-            var flashcardId = urlParams.get('id');
-
+            let flashcardId = sessionStorage.getItem('flashcardId');
+            console.log("Session Flashcard _id:", flashcardId);
+            if (!flashcardId) {
+                alert("Flashcard ID not found!");
+                window.location.href = "index_editor.html";
+                return;
+            }
             $.get('/flashcards/' + flashcardId, function(data) {
                 if (data.error) {
                     alert("Flashcard not found");
                     return;
                 }
-
                 $('#edit-question').val(data.question);
                 $('#edit-answer').val(data.answer);
+                $('#edit-group').val(data.group_id);
             });
-
             $('#edit-form').submit(function(e) {
                 e.preventDefault();
 
-                var question = $('#edit-question').val();
-                var answer = $('#edit-answer').val();
+                const question = $('#edit-question').val();
+                const answer = $('#edit-answer').val();
+                const groupId = $('#edit-group').val();
 
                 $.ajax({
                     url: '/flashcards/' + flashcardId,
                     type: 'PUT',
                     contentType: 'application/json',
-                    data: JSON.stringify({ question: question, answer: answer }),
+                    data: JSON.stringify({ question, answer, group_id: groupId }),
                     success: function(updatedFlashcard) {
                         alert("Flashcard updated successfully!");
                         window.location.href = "index_editor.html";
+                    },
+                    error: function() {
+                        alert("Error updating flashcard.");
                     }
                 });
             });
